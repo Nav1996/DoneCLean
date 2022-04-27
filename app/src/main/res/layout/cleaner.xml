@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.example.android.employeesmanagementsoftware.Utilities.VerticalScrollview
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="260dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/employee_background">
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/employee_icon"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/unknown"
+                android:background="@drawable/employee_icon"
+                android:scaleType="centerCrop" />
+
+            <EditText
+                android:id="@+id/employee_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/employee_icon"
+                android:layout_centerHorizontal="true"
+                android:paddingTop="@dimen/padding_employee"
+                android:hint="Employee's Name"
+                />
+
+            <EditText
+                android:id="@+id/post"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/employee_name"
+                android:layout_centerHorizontal="true"
+                android:paddingTop="@dimen/padding_employee"
+                android:hint="Employee's post" />
+
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding_employee"
+                android:src="@mipmap/mail"
+                android:tint="@color/colorPrimary" />
+
+            <EditText
+                android:id="@+id/email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="mohamed_gamal@yahoo.com" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding_employee"
+                android:src="@mipmap/phone"
+                android:tint="@color/colorPrimary" />
+
+            <EditText
+                android:id="@+id/phone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="0100000000" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding_employee"
+                android:src="@mipmap/calendar"
+                android:tint="@color/colorPrimary" />
+
+
+
+            <EditText
+                android:id="@+id/birthday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:inputType="datetime"
+                android:hint="Birthdate" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding_employee"
+                android:src="@mipmap/tasks"
+                android:tint="@color/colorTheme" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                style="@style/subtitle"
+                android:text="Tasks" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ListView
+                android:id="@+id/tasks_list"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/list_height"
+                android:drawSelectorOnTop="true"
+                android:orientation="vertical"></ListView>
+
+        </RelativeLayout>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding_employee"
+                android:src="@mipmap/notes"
+                android:tint="@color/colorTheme" />
+
+
+        <com.example.android.employeesmanagementsoftware.Utilities.CustomEditTextWithBullets
+            android:id="@+id/notes"
+            android:hint="Notes"
+            android:background="@drawable/note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:layout_margin="8dp"
+         ></com.example.android.employeesmanagementsoftware.Utilities.CustomEditTextWithBullets>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="@dimen/padding_employee"
+                android:text="Performance"
+                style="@style/subtitle"/>
+
+
+            <RatingBar
+                android:id="@+id/ratingBar_employee"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:isIndicator="true"
+                android:numStars="5"
+                android:rating="0"
+                android:stepSize="0.1"
+                android:theme="@style/RatingBar" />
+
+        </LinearLayout>
+    </LinearLayout>
+</com.example.android.employeesmanagementsoftware.Utilities.VerticalScrollview>
+
+

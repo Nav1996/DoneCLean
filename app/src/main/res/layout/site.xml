@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.example.android.employeesmanagementsoftware.Utilities.VerticalScrollview
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Departement's description"
+                android:padding="16dp"
+                style="@style/text"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/padding_employee"
+                    android:src="@mipmap/team"
+                    android:tint="@color/colorTheme" />
+
+                <TextView
+                    style="@style/subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Current employees on the site" />
+
+            </LinearLayout>
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ListView
+                    android:id="@+id/employees_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/list_height"
+                    android:drawSelectorOnTop="true"
+                    android:orientation="vertical"></ListView>
+            </RelativeLayout>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:layout_gravity="right"
+                android:scaleType="center"
+                android:src="@mipmap/ic_hire">
+
+            </android.support.design.widget.FloatingActionButton>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/padding_employee"
+                    android:src="@mipmap/tasks"
+                    android:tint="@color/colorTheme" />
+
+                <TextView
+                    style="@style/subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Site's tasks" />
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <ListView
+                android:id="@+id/tasks_list"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/list_height"
+                android:drawSelectorOnTop="true"
+                android:orientation="vertical">
+            </ListView>
+
+            </RelativeLayout>
+        </LinearLayout>
+    </com.example.android.employeesmanagementsoftware.Utilities.VerticalScrollview>
+

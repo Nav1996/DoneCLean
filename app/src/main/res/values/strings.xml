@@ -1,0 +1,49 @@
+<resources>
+    <string name="app_name">DoneClean</string>
+
+    <string name="department_drop_down">Site</string>
+    <string name="choose_department">Choose Site</string>
+    <string-array name="departments_array">
+        <item>engineering</item>
+        <item>accounting</item>
+    </string-array>
+    <string-array name="engineering_employees">
+        <item>Omar</item>
+        <item>Ahmed</item>
+        <item>Aly</item>
+    </string-array>
+    <string-array name="accounting_employees">
+        <item>Sara</item>
+        <item>Mohammad</item>
+        <item>Karim</item>
+    </string-array>
+    <string-array name="user_types">
+        <item>Supervisor</item>
+        <item>Cleaner</item>
+    </string-array>
+
+    <string name="title_activity_main2">Site Creation</string>
+    <string name="title_activity_employee_creation">Cleaner Creation</string>
+    <string name="save_button_task_creation">save</string>
+    <string name="save_menu">save</string>
+    <string name="delete_menu">Delete</string>
+    <string name="update_menu">Edit</string>
+    <string name="done_menu">done</string>
+    <string name="title_activity_starting_page">ManagerSystem</string>
+    <string name="action_settings">Delete All</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="post">Post</string>
+    <string name="deleteEmp">Are you sure you want to fire this employee ?</string>
+    <string name="fire">Fire</string>
+    <string name="not_deleteEmp">Can\'t fire this employee</string>
+    <string name="cancel">Cancel</string>
+    <string name="deleteDep">Are you sure you want to delete this site ?</string>
+    <string name="not_deleteDep">Can\'t delete this department</string>
+    <string name="ok">OK</string>
+    <string name="completed">Completed</string>
+    <string name="evaluation">Evaluation</string>
+    <string name="choose_employees">Choose Cleaners:</string>
+</resources>
