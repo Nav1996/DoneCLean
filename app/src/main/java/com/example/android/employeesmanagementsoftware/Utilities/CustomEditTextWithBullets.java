@@ -7,7 +7,7 @@ import android.util.AttributeSet;
 import com.example.android.employeesmanagementsoftware.R;
 
 
-public class CustomEditTextWithBullets extends android.support.v7.widget.AppCompatEditText {
+public class CustomEditTextWithBullets extends androidx.appcompat.widget.AppCompatEditText {
 
     Context mContext;
     Typeface mTypeface;

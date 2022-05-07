@@ -2,8 +2,8 @@ package com.example.android.employeesmanagementsoftware.SiteDB;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,11 +18,11 @@ import java.util.List;
 public class MySiteRecyclerViewAdapter extends RecyclerView.Adapter<MySiteRecyclerViewAdapter.ViewHolder> {
 
     private final List<SiteItem> mValues;
-    private final OnListFragmentInteractionListener mListener;
+    private final Context mListener;
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
-    public MySiteRecyclerViewAdapter(List<SiteItem> items, OnListFragmentInteractionListener listener) {
+    public MySiteRecyclerViewAdapter(List<SiteItem> items, Context listener) {
         mValues = items;
         mListener = listener;
     }
@@ -42,11 +42,11 @@ public class MySiteRecyclerViewAdapter extends RecyclerView.Adapter<MySiteRecycl
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
-                }
+//                if (null != mListener) {
+//                    // Notify the active callbacks interface (the activity, if the
+//                    // fragment is attached to one) that an item has been selected.
+//                    mListener.onListFragmentInteraction(holder.mItem);
+//                }
                 Context context = v.getContext();
                 Intent intent = new Intent(context, SiteActivity.class);
                 intent.putExtra("departmentId",mValues.get(position).id); // set id to Department activity

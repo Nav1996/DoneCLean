@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.widget.Toast;
 
 import com.example.android.employeesmanagementsoftware.data.Contracts.SiteContract;
 import com.example.android.employeesmanagementsoftware.data.Contracts.CleanerContract;
@@ -30,6 +31,9 @@ public class EmployeesManagementDbHelper extends SQLiteOpenHelper {
 
 
     private static final int DATABASE_VERSION = 1;
+
+    DatabaseReference dbref;
+//    Task task;
 
 
     public EmployeesManagementDbHelper(Context context) {
@@ -379,33 +383,42 @@ public class EmployeesManagementDbHelper extends SQLiteOpenHelper {
 
     public Long addTask(Task task)
     {
-        //adds task to db
-        SQLiteDatabase db = this.getWritableDatabase(); //gets writeable instance of database
-        ContentValues cv  = new ContentValues(); //used for inserting an entry
+        long task_id = 0;
+        dbref = FirebaseDatabase.getInstance().getReference().child("Task");
+        try {
+            dbref.push().setValue(task);
+            task_id = task.getId();
 
-        cv.put(TaskEntry.COLUMN_TASK_NAME,task.getTaskName());
-        cv.put(TaskEntry.COLUMN_TASK_EVALUATION, task.getEvaluation());
+        } catch (Exception e) {
 
-        if(task.getTaskDetails()!=null && !task.getTaskDetails().isEmpty()&&!task.getTaskDetails().trim().isEmpty())
-            cv.put(TaskEntry.COLUMN_TASK_DESCRIPTION,task.getTaskDetails());
-
-        if(task.getTaskDeadline()!=null && !task.getTaskDeadline().isEmpty()&&!task.getTaskDeadline().trim().isEmpty())
-            cv.put(TaskEntry.COLUMN_TASK_DEADLINE, task.getTaskDeadline());
-        cv.put(TaskEntry.COLUMN_TASK_COMPLETED,task.isDone());
-        cv.put(TaskEntry.COLUMN_TASK_DATE,task.getTaskDate());
-        long task_id = db.insert(TaskContract.TABLE_NAME,null,cv); //reutrns a flag to indicate succes of insertion
-
-
-        cv = new ContentValues();
-        ArrayList<Long> emplyee_ids = task.getEmployees_id();
-        if (emplyee_ids!=null)
-        {
-            for(long emp_id:emplyee_ids){
-                cv.put(CleanerContract.TABLE_NAME+EmployeeEntry._ID,emp_id);
-                cv.put(TaskContract.TABLE_NAME+TaskEntry._ID,task_id);
-                long flag = db.insert("employee_task",null,cv); //reutrns a flag to indicate succes of insertion
-            }
         }
+        //adds task to db
+//        SQLiteDatabase db = this.getWritableDatabase(); //gets writeable instance of database
+//        ContentValues cv  = new ContentValues(); //used for inserting an entry
+//
+//        cv.put(TaskEntry.COLUMN_TASK_NAME,task.getTaskName());
+//        cv.put(TaskEntry.COLUMN_TASK_EVALUATION, task.getEvaluation());
+//
+//        if(task.getTaskDetails()!=null && !task.getTaskDetails().isEmpty()&&!task.getTaskDetails().trim().isEmpty())
+//            cv.put(TaskEntry.COLUMN_TASK_DESCRIPTION,task.getTaskDetails());
+//
+//        if(task.getTaskDeadline()!=null && !task.getTaskDeadline().isEmpty()&&!task.getTaskDeadline().trim().isEmpty())
+//            cv.put(TaskEntry.COLUMN_TASK_DEADLINE, task.getTaskDeadline());
+//        cv.put(TaskEntry.COLUMN_TASK_COMPLETED,task.isDone());
+//        cv.put(TaskEntry.COLUMN_TASK_DATE,task.getTaskDate());
+//        long task_id = db.insert(TaskContract.TABLE_NAME,null,cv); //reutrns a flag to indicate succes of insertion
+//
+//
+//        cv = new ContentValues();
+//        ArrayList<Long> emplyee_ids = task.getEmployees_id();
+//        if (emplyee_ids!=null)
+//        {
+//            for(long emp_id:emplyee_ids){
+//                cv.put(CleanerContract.TABLE_NAME+EmployeeEntry._ID,emp_id);
+//                cv.put(TaskContract.TABLE_NAME+TaskEntry._ID,task_id);
+//                long flag = db.insert("employee_task",null,cv); //reutrns a flag to indicate succes of insertion
+//            }
+//        }
         return task_id;
     }
 

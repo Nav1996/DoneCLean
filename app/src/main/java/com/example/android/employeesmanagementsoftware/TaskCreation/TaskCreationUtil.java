@@ -2,8 +2,7 @@ package com.example.android.employeesmanagementsoftware.TaskCreation;
 
 
 import android.app.Activity;
-import android.support.design.widget.TextInputLayout;
-import android.util.Log;
+import com.google.android.material.textfield.TextInputLayout;
 
 import com.example.android.employeesmanagementsoftware.data.DBHelpers.EmployeesManagementDbHelper;
 import com.example.android.employeesmanagementsoftware.taskDB.Task;
@@ -23,7 +22,7 @@ class TaskCreationUtil {
     //return a suitable TaskCreationCommandObject based on the task's id
     TaskCreationCommand getCommander(long task_id,Task task) {
 
-        return task_id == NEW_TASK_ID ? new NewCommand(employeeDBHelper) : new EditCommand(activity, employeeDBHelper, task_id,task);
+        return task_id == NEW_TASK_ID ? new NewCommand() : new EditCommand(activity, employeeDBHelper, task_id,task);
 
     }
 

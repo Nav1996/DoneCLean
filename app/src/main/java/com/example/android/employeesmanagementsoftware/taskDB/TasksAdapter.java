@@ -2,9 +2,9 @@ package com.example.android.employeesmanagementsoftware.taskDB;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Parcelable;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +22,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
 
     private  Context context;
     private ArrayList<Task> data;
-
+    private int positioned;
 
     public TasksAdapter(Context context, ArrayList<Task> data)
     {
@@ -49,6 +49,8 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
         holder.disctask.setText(task.getTaskDetails());
         holder.datetask.setText(task.getTaskDate());
         holder.deadlinetask.setText(task.getTaskDeadline());
+
+        positioned = position;
     }
 
     @Override
@@ -75,12 +77,13 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHol
         }
         @Override
         public void onClick(View v) {
-            Log.v(" idfrom Ad", "" +  data.get(getAdapterPosition()).getId());
+//            Log.v(" idfrom Ad", "" +  data.get(getAdapterPosition()).getId());
             Intent in = new Intent(context, TaskActivity.class);
             in.putExtra("data",data);
-            Log.v("position", "" +  data.get(getAdapterPosition()));
+//            Log.v("position", "" +  data.get(getAdapterPosition()));
             in.putExtra("position",  getAdapterPosition());
-            in.putExtra("taskId", data.get(getAdapterPosition()).getId());
+            Toast.makeText(context.getApplicationContext(), "TaskId- " +data.get(positioned), Toast.LENGTH_SHORT).show();
+//            in.putExtra("task_id", data.get(getAdapterPosition()).getId());
             context.startActivity(in);
         }
 

@@ -16,8 +16,12 @@ public class NewCommand implements TaskCreationCommand {
 
     private EmployeesManagementDbHelper employeeDBHelper;
     private static final String TAG="new";
-    public NewCommand(EmployeesManagementDbHelper employeeDBHelper) {
-        this.employeeDBHelper = employeeDBHelper;
+//    public NewCommand(EmployeesManagementDbHelper employeeDBHelper) {
+//        this.employeeDBHelper = employeeDBHelper;
+//    }
+
+    public NewCommand() {
+
     }
 
     @Override

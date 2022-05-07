@@ -3,25 +3,35 @@ package com.example.android.employeesmanagementsoftware.taskDB;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RatingBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.employeesmanagementsoftware.CleanerDB.CleanerActivity;
 import com.example.android.employeesmanagementsoftware.CleanerDB.CleanerAdapter;
+import com.example.android.employeesmanagementsoftware.StartingPageActivity;
 import com.example.android.employeesmanagementsoftware.TaskCreation.TaskCreation;
 import com.example.android.employeesmanagementsoftware.R;
 import com.example.android.employeesmanagementsoftware.data.DBHelpers.EmployeesManagementDbHelper;
+import com.example.android.employeesmanagementsoftware.data.Models.TaskClass;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import org.jetbrains.annotations.NotNull;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import java.util.ArrayList;
 
@@ -40,52 +50,98 @@ public class TaskActivity extends AppCompatActivity implements Evaluation.Evalua
     private long taskID;
     private CleanerAdapter adapter;
 
+    DatabaseReference dbref;
+    TaskClass taskobj;
+    String task_id;
+    ListView employees;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
-         employeeDBHelper = new EmployeesManagementDbHelper(this);
-         datetext = findViewById(R.id.taskdate);
-         descriptiontext = findViewById(R.id.taskdesc);
-         deadlinetext = findViewById(R.id.deadline);
-         mRatingBar = findViewById(R.id.ratingBar_task);
-         mEvaluation = findViewById(R.id.evaluation);
-         Intent intent= getIntent();
-         position = intent.getExtras().getInt("position");
-         tasks = (ArrayList<Task>) getIntent().getSerializableExtra("data");
-         taskID = getIntent().getExtras().getLong("taskId");
-            setTitle(tasks.get(position).getTaskName());
-            datetext.setText(tasks.get(position).getTaskDate());
-            descriptiontext.setText(tasks.get(position).getTaskDetails());
-            deadlinetext.setText(tasks.get(position).getTaskDeadline());
-            if (tasks.get(position).isDone()) {
-                mRatingBar.setRating(tasks.get(position).getEvaluation());
-                mRatingBar.setVisibility(View.VISIBLE);
-                mEvaluation.setVisibility(View.VISIBLE);
+//         employeeDBHelper = new EmployeesManagementDbHelper(this);
+
+        Intent intent = getIntent();
+        task_id = intent.getStringExtra("task_id");
+//        Toast.makeText(getApplicationContext(), "Task - " + task_id, Toast.LENGTH_SHORT).show();
+
+        getTaskDetails(task_id);
+
+        datetext = findViewById(R.id.taskdate);
+        descriptiontext = findViewById(R.id.taskdesc);
+        deadlinetext = findViewById(R.id.deadline);
+        mRatingBar = findViewById(R.id.ratingBar_task);
+        mEvaluation = findViewById(R.id.evaluation);
+        employees = findViewById(R.id.cleaner_tasks_list);
+
+//         Intent intent= getIntent();
+//         position = intent.getExtras().getInt("position");
+//         tasks = (ArrayList<Task>) getIntent().getSerializableExtra("data");
+//         taskID = getIntent().getExtras().getLong("taskId");
+//
+        taskobj = new TaskClass();
+        ArrayList<String> cleaners = new ArrayList<>();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd G 'at' HH:mm:ss z");
+        String currentDateandTime = sdf.format(new Date());
+
+        dbref = FirebaseDatabase.getInstance().getReference().child("Tasks").child(task_id);
+
+        dbref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
+                taskobj.setName(dataSnapshot.child("name").getValue().toString());
+                taskobj.setDeadline(dataSnapshot.child("deadline").getValue().toString());
+                taskobj.setDescription(dataSnapshot.child("description").getValue().toString());
+                taskobj.setId(dataSnapshot.child("id").getValue().toString());
+                taskobj.setDone((boolean) dataSnapshot.child("done").getValue());
+//                taskobj.setEvaluation(dataSnapshot.child("evaluation").getValue());
+                taskobj.setEmployees(dataSnapshot.child("employees").getValue().toString());
+
+                datetext.setText(currentDateandTime);
+                descriptiontext.setText(taskobj.getDescription());
+                deadlinetext.setText(taskobj.getDeadline());
+                cleaners.add(taskobj.getEmployees());
+                if (taskobj.isDone()) {
+                    mRatingBar.setRating(taskobj.getEvaluation());
+                    mRatingBar.setVisibility(View.VISIBLE);
+                    mEvaluation.setVisibility(View.VISIBLE);
+                }
+
+                ArrayAdapter<String> adapterClean = new ArrayAdapter<>(getApplicationContext(),
+                        android.R.layout.simple_list_item_1, cleaners);
+                employees.setAdapter(adapterClean);
+                onEmployeeClicked();
             }
-        setEmployees();
-
-        }
-
-
-    private void setEmployees(){
-
-        Cursor cursor = employeeDBHelper.getEmployeesOfTask(taskID);
-        ListView employees = (ListView)findViewById(R.id.employees_list);
-        CleanerAdapter adapter = new CleanerAdapter(this,cursor);
-        employees.setAdapter(adapter);
-        RelativeLayout emptyView = (RelativeLayout) findViewById(R.id.empty_employees);
-        employees.setEmptyView(emptyView);
-        employees.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+            public void onCancelled(@NonNull @NotNull DatabaseError databaseError) {
+
+            }
+        });
+//
+
+//        setEmployees();
+
+    }
+
+    private void getTaskDetails(String task_id) {
+
+    }
+
+    private void getEmployee(String name) {
+//        dbref = FirebaseDatabase.getInstance().getReference().child("member")
+    }
+
+    private void onEmployeeClicked() {
+        employees.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(TaskActivity.this, CleanerActivity.class);
-                intent.putExtra("employeeId", id);
+                intent.putExtra("Emp_ID", taskobj.getEmployees());
                 startActivity(intent);
             }
         });
-
     }
 
 
@@ -110,8 +166,8 @@ public class TaskActivity extends AppCompatActivity implements Evaluation.Evalua
         }
         if (id == R.id.action_update) {
             Intent intent = new Intent(TaskActivity.this, TaskCreation.class);
-            intent.putExtra("task", tasks.get(position));
-            intent.putExtra("task_id",tasks.get(position).getId());
+            intent.putExtra("task", taskobj.getClass());
+            intent.putExtra("task_id",taskobj.getId());
             intent.putExtra("IsEdit", true);
             finish();
             startActivity(intent);
@@ -130,12 +186,12 @@ public class TaskActivity extends AppCompatActivity implements Evaluation.Evalua
 
     @Override
     public void applyingRating(int rate) {
-        Log.v("ID From Activityr", "" + tasks.get(position).getId());
-        boolean re = employeeDBHelper.updateTaskEvaluation(tasks.get(position).getId(),true,rate);
-        Log.v("boolean", "" + re);
-        tasks.get(position).setEvaluation(rate);
-        tasks.get(position).setDone(true);
-        TasksFragment.newInstance().updateTasksList(tasks.get(position),(int)taskID);
+//        Log.v("ID From Activityr", "" + taskobj.getId());
+//        boolean re = employeeDBHelper.updateTaskEvaluation(tasks.get(position).getId(),true,rate);
+//        Log.v("boolean", "" + re);
+        taskobj.setEvaluation(rate);
+        taskobj.setDone(true);
+//        TasksFragment.newInstance().updateTasksList(tasks.get(position),(int)taskID);
         mRatingBar.setRating(rate);
         mRatingBar.setVisibility(View.VISIBLE);
         mEvaluation.setVisibility(View.VISIBLE);
@@ -145,10 +201,26 @@ public class TaskActivity extends AppCompatActivity implements Evaluation.Evalua
         builder.setMessage("Are you sure you want to delete this task ?");
         builder.setPositiveButton("End", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                if (tasksFragment.deleteTaskFromList((int)tasks.get(position).getId())){
-                    finish();
-                }else
-                    Toast.makeText(getApplicationContext(), "Can't close this department", Toast.LENGTH_LONG).show();
+                DatabaseReference dbref = FirebaseDatabase.getInstance().getReference().child("Tasks");
+                DatabaseReference delRef;
+
+                dbref.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.hasChild(task_id)) {
+                            DatabaseReference delRef = FirebaseDatabase.getInstance().getReference().child("Tasks").child(task_id);
+                            delRef.removeValue();
+                            Toast.makeText(getApplicationContext(), "Deleted Successfully", Toast.LENGTH_SHORT).show();
+
+                            Intent intent = new Intent(TaskActivity.this, StartingPageActivity.class);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError databaseError) {
+
+                    }
+                });
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

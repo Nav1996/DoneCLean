@@ -3,8 +3,8 @@ package com.example.android.employeesmanagementsoftware.login;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.design.widget.TextInputEditText;
-import android.support.v7.app.AppCompatActivity;
+import com.google.android.material.textfield.TextInputEditText;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -15,11 +15,8 @@ import android.widget.Toast;
 import com.example.android.employeesmanagementsoftware.MainActivity;
 import com.example.android.employeesmanagementsoftware.R;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
-
     TextInputEditText email,pass;
     Button login;
     FirebaseAuth firebaseAuth;
@@ -81,8 +78,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if(!validepass() | !valideemail()){
             return;
         }
-        String userEmail = email.getText().toString().trim();
-        String userPassword = pass.getText().toString().trim();
+        userEmail = email.getText().toString().trim();
+        userPassword = pass.getText().toString().trim();
         firebaseAuth.signInWithEmailAndPassword(
                 userEmail, userPassword)
                 .addOnCompleteListener(
@@ -123,4 +120,5 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
         setValidLogin();
     }
+
 }

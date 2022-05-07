@@ -3,21 +3,32 @@ package com.example.android.employeesmanagementsoftware.taskDB;
 import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
 import com.example.android.employeesmanagementsoftware.R;
 import com.example.android.employeesmanagementsoftware.data.Contracts.TaskContract.TaskEntry;
 import com.example.android.employeesmanagementsoftware.data.DBHelpers.EmployeesManagementDbHelper;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 
 
 public class TasksFragment extends Fragment {
+    DatabaseReference dbref;
     private static TasksFragment fragment ;
     private EmployeesManagementDbHelper employeeDBHelper;
     private ArrayList<Task> mValues;
@@ -35,10 +46,7 @@ public class TasksFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        employeeDBHelper = new EmployeesManagementDbHelper(this.getContext());
-        Cursor cursor =employeeDBHelper.getAllTasksCursor();
         mValues = new ArrayList<>();
-        setmValues(cursor);
     }
 
     @Override
@@ -50,46 +58,38 @@ public class TasksFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        RecyclerView recyclerView =  view.findViewById(R.id.task_list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mAdapter = new TasksAdapter(getActivity(),mValues);
-        recyclerView.setAdapter(mAdapter);
-    }
-
-    private void setmValues (Cursor cursor){
         mValues = new ArrayList<>();
-        if (cursor.moveToFirst()) {
-            while (!cursor.isAfterLast()) {
-                Task task = new Task();
-                task.setId(cursor.getString(cursor.getColumnIndex(TaskEntry._ID)));
-                task.setTaskName(cursor.getString(cursor.getColumnIndex(TaskEntry.COLUMN_TASK_NAME)));
-                task.setTaskDetails(cursor.getString(cursor.getColumnIndex(TaskEntry.COLUMN_TASK_DESCRIPTION)));
-                task.setTaskDeadline(cursor.getString(cursor.getColumnIndex(TaskEntry.COLUMN_TASK_DEADLINE)));
-                task.setTaskDate(cursor.getString(cursor.getColumnIndex(TaskEntry.COLUMN_TASK_DATE)));
-                task.setEvaluation(cursor.getInt(cursor.getColumnIndex(TaskEntry.COLUMN_TASK_EVALUATION)));
-                if (cursor.getInt(cursor.getColumnIndex(TaskEntry.COLUMN_TASK_COMPLETED)) == 0){
-                    task.setDone(false);
-                }else {
-                    task.setDone(true);
-                }
-                ArrayList<Long> ids = new ArrayList<>();
-                //set employees ids
-                Cursor employees = employeeDBHelper.getEmployeesOfTask(cursor.getLong(cursor.getColumnIndex(TaskEntry._ID)));
-                if (cursor.moveToFirst() && cursor.getCount() > 0) {
-                    do {
-                        ids.add(cursor.getLong(0));
-                    } while (cursor.moveToNext());
-                }
-                employees.close();
-                task.setEmployees_id(ids);
-                mValues.add(task);
-                cursor.moveToNext();}
 
+        DatabaseReference dbref = FirebaseDatabase.getInstance().getReference().child("Tasks");
 
-        }
-        cursor.close();
+        dbref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        Task task = new Task();
+                        task.setTaskName(snapshot.child("name").getValue().toString());
+                        task.setTaskDetails(snapshot.child("description").getValue().toString());
+                        task.setTaskDeadline(snapshot.child("deadline").getValue().toString());
+
+                        mValues.add(task);
+                    }
+
+                    RecyclerView recyclerView =  view.findViewById(R.id.task_list);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                    mAdapter = new TasksAdapter(getActivity(),mValues);
+                    recyclerView.setAdapter(mAdapter);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError databaseError) {
+
+            }
+        });
 
     }
+
     public boolean updateTasksList(Task updatedTask, int id){
         for(int i = 0; i < mValues.size(); i++) {
             if (mValues.get(i).getId() == id) {
@@ -101,6 +101,7 @@ public class TasksFragment extends Fragment {
         mAdapter.notifyItemChanged(mValues.indexOf(updatedTask), updatedTask);
         return employeeDBHelper.updateTask(updatedTask);
     }
+
     public boolean deleteTaskFromList(int id ){
         boolean remove = employeeDBHelper.deleteTask(id);
         for(int i = 0; i < mValues.size(); i++) {
@@ -113,11 +114,26 @@ public class TasksFragment extends Fragment {
         return remove;
     }
     public boolean addTaskToView(Task mTask){
-        Long id  = employeeDBHelper.addTask(mTask);
-        mTask.setId(id.toString());
-        mValues.add(mTask);
-        if (mAdapter != null) {
-            mAdapter.notifyDataSetChanged();
+        long id = mTask.getId();
+        try {
+            String task_id = String.valueOf(id);
+            dbref = FirebaseDatabase.getInstance().getReference().child("Tasks").child(task_id);
+            try {
+                dbref.setValue(mTask);
+
+            } catch (Exception e) {
+
+            }
+            //        Long id  = employeeDBHelper.addTask(mTask);
+            //        mTask.setId(id.toString());
+            mValues.add(mTask);
+            if (mAdapter != null) {
+                mAdapter.notifyDataSetChanged();
+            }
+
+        }
+        catch (Exception e) {
+            Toast.makeText(getContext(), "Cannot save task", Toast.LENGTH_SHORT).show();
         }
         return id > 0;
     }

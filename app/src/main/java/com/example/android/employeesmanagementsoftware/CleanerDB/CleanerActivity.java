@@ -13,27 +13,34 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.Toast;
 
-import com.example.android.employeesmanagementsoftware.SiteDB.TaskAdapter;
 import com.example.android.employeesmanagementsoftware.R;
 import com.example.android.employeesmanagementsoftware.Utilities.CustomEditTextWithBullets;
 import com.example.android.employeesmanagementsoftware.data.Contracts.CleanerContract.EmployeeEntry;
 import com.example.android.employeesmanagementsoftware.data.DBHelpers.EmployeesManagementDbHelper;
+import com.example.android.employeesmanagementsoftware.data.Models.Member;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
-import java.io.File;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 
 
 public class CleanerActivity extends AppCompatActivity {
@@ -48,11 +55,20 @@ public class CleanerActivity extends AppCompatActivity {
     private long employeeId;
     private String picturePath;
     private boolean imgChanged = false;
+    String emp_id;
+    Member cleaner;
+    DatabaseReference dbref;
+    ArrayList<String> tasks;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.cleaner);
+
+        Intent intent2 = getIntent();
+        emp_id = intent2.getStringExtra("Emp_ID");
+
+        tasksList = findViewById(R.id.tasks_list);
         name = findViewById(R.id.employee_name);
         email = findViewById(R.id.email);
         phone =  findViewById(R.id.phone);
@@ -81,21 +97,33 @@ public class CleanerActivity extends AppCompatActivity {
         });
 
 
-        helper = new EmployeesManagementDbHelper(this);
-        Intent intent = getIntent();
-        employeeId = intent.getExtras().getLong("employeeId");
+//        helper = new EmployeesManagementDbHelper(this);
+//        Intent intent = getIntent();
+//        employeeId = intent.getExtras().getLong("employeeId");
         setEmployee();
-        setEmployeeTasks();
+//        setEmployeeTasks();
     }
 
     private void setEmployeeTasks() {
         tasksList = (ListView) findViewById(R.id.tasks_list);
-        Cursor cursor = helper.getTasksOfEmployee(employeeId);
-        CursorAdapter tasksAdapter = new TaskAdapter(this, cursor);
-        tasksList.setAdapter(tasksAdapter);
-//        RelativeLayout noTasks = findViewById(R.id.empty_view_task);
-//        tasksList.setEmptyView(noTasks);
-        setPerformance(cursor);
+        tasks = new ArrayList<>();
+
+        Query query = FirebaseDatabase.getInstance().getReference().child("Tasks").
+                orderByChild("employees").equalTo(emp_id);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
+                tasks.add(dataSnapshot.child("name").getValue().toString());
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError databaseError) {
+
+            }
+        });
+
+        Toast.makeText(getApplicationContext(), "Task - "+ tasks, Toast.LENGTH_SHORT).show();
 
     }
 
@@ -179,16 +207,22 @@ public class CleanerActivity extends AppCompatActivity {
     }
 
     private void showDeleteConfirmationDialog() {
+        dbref = FirebaseDatabase.getInstance().getReference().child("member").child(emp_id);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.deleteEmp);
         builder.setPositiveButton(R.string.fire, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                if (helper.deleteEmployee(employeeId)){
-                    Intent returnIntent = new Intent();
-                    setResult(Activity.RESULT_OK, returnIntent);
-                    finish();
-                }else
-                    Toast.makeText(getApplicationContext(), R.string.not_deleteEmp, Toast.LENGTH_LONG).show();
+                dbref.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
+                        dbref.removeValue();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError databaseError) {
+                        Toast.makeText(getApplicationContext(), "Can't fire employee", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -203,23 +237,39 @@ public class CleanerActivity extends AppCompatActivity {
     }
 
     private void setEmployee() {
-        Cursor cursor = helper.getEmployee(employeeId);
+//        Cursor cursor = helper.getEmployee(employeeId);
+        Query query = FirebaseDatabase.getInstance().getReference().child("member").orderByChild("name").equalTo(emp_id);
         //setting data of employee
-        if (cursor.moveToFirst()) {
-            name.setText(cursor.getString(cursor.getColumnIndex(EmployeeEntry.COLUMN_EMPLOYEE_NAME)));
-            email.setText(cursor.getString(cursor.getColumnIndex(EmployeeEntry.COLUMN_EMPLOYEE_EMAIL)));
-            phone.setText(cursor.getString(cursor.getColumnIndex(EmployeeEntry.COLUMN_EMPLOYEE_PHONE)));
-            birthday.setText(cursor.getString(cursor.getColumnIndex(EmployeeEntry.COLUMN_EMPLOYEE_BIRTHDATE)));
-            job.setText(cursor.getString(cursor.getColumnIndex(EmployeeEntry.COLUMN_EMPLOYEE_JOB)));
-            notes.setText(cursor.getString(cursor.getColumnIndex(EmployeeEntry.COLUMN_EMPLOYEE_NOTES)));
-            String path = cursor.getString(cursor.getColumnIndex(EmployeeEntry.COLUMN_EMPLOYEE_PHOTO));
-            if (!TextUtils.isEmpty(path) && (new File(path)).exists()) {
-                image.setImageBitmap(BitmapFactory.decodeFile(path));
-            } else {
-                image.setImageResource(R.drawable.unknown);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    Toast.makeText(getApplicationContext(), "Emp -"+dataSnapshot.child("email").getValue(), Toast.LENGTH_SHORT).show();
+//                    name.setText(dataSnapshot.get().toString());
+//                    email.setText(dataSnapshot.child("email").getValue().toString());
+//                    phone.setText(dataSnapshot.child("phone").getValue().toString());
+//                    job.setText(dataSnapshot.child("userType").getValue().toString());
+//                    name.setText(dataSnapshot.child("name").getValue().toString());
+//
+//                    cleaner = new Member(dataSnapshot.child("name").getValue().toString(),
+//                            dataSnapshot.child("email").getValue().toString(),
+//                            dataSnapshot.child("password").getValue().toString(),
+//                            dataSnapshot.child("location").getValue().toString(),
+//                            dataSnapshot.child("phone").getValue().toString(),
+//                            dataSnapshot.child("userType").getValue().toString());
+//
+//                    setEmployeeTasks();
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), "Else called", Toast.LENGTH_SHORT).show();
+                }
             }
-        }
-        cursor.close();
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
 
