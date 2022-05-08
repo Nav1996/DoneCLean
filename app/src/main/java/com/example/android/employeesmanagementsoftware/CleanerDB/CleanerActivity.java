@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -114,7 +115,15 @@ public class CleanerActivity extends AppCompatActivity {
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
-                tasks.add(dataSnapshot.child("name").getValue().toString());
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        tasks.add(snapshot.child("name").getValue().toString());
+                    }
+
+                    ArrayAdapter<String> adapterClean = new ArrayAdapter<>(getApplicationContext(),
+                            android.R.layout.simple_list_item_1, tasks);
+                    tasksList.setAdapter(adapterClean);
+                }
             }
 
             @Override
@@ -207,15 +216,21 @@ public class CleanerActivity extends AppCompatActivity {
     }
 
     private void showDeleteConfirmationDialog() {
-        dbref = FirebaseDatabase.getInstance().getReference().child("member").child(emp_id);
+        Query query = FirebaseDatabase.getInstance().getReference().child("member").orderByChild("name").equalTo(emp_id);
+        //setting data of employee
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.deleteEmp);
         builder.setPositiveButton(R.string.fire, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                dbref.addValueEventListener(new ValueEventListener() {
+                query.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
-                        dbref.removeValue();
+                        if (dataSnapshot.exists()) {
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                snapshot.getRef().removeValue();
+                                Toast.makeText(getApplicationContext(), "Successfully Deleted", Toast.LENGTH_SHORT).show();
+                            }
+                        }
                     }
 
                     @Override
@@ -242,23 +257,25 @@ public class CleanerActivity extends AppCompatActivity {
         //setting data of employee
         query.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    Toast.makeText(getApplicationContext(), "Emp -"+dataSnapshot.child("email").getValue(), Toast.LENGTH_SHORT).show();
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+//                    Toast.makeText(getApplicationContext(), "Emp -"+dataSnapshot.child("email").getValue(), Toast.LENGTH_SHORT).show();
 //                    name.setText(dataSnapshot.get().toString());
-//                    email.setText(dataSnapshot.child("email").getValue().toString());
-//                    phone.setText(dataSnapshot.child("phone").getValue().toString());
-//                    job.setText(dataSnapshot.child("userType").getValue().toString());
-//                    name.setText(dataSnapshot.child("name").getValue().toString());
-//
-//                    cleaner = new Member(dataSnapshot.child("name").getValue().toString(),
-//                            dataSnapshot.child("email").getValue().toString(),
-//                            dataSnapshot.child("password").getValue().toString(),
-//                            dataSnapshot.child("location").getValue().toString(),
-//                            dataSnapshot.child("phone").getValue().toString(),
-//                            dataSnapshot.child("userType").getValue().toString());
-//
-//                    setEmployeeTasks();
+                        email.setText(dataSnapshot.child("email").getValue().toString());
+                        phone.setText(dataSnapshot.child("phone").getValue().toString());
+                        job.setText(dataSnapshot.child("userType").getValue().toString());
+                        name.setText(dataSnapshot.child("name").getValue().toString());
+
+                        cleaner = new Member(dataSnapshot.child("name").getValue().toString(),
+                                dataSnapshot.child("email").getValue().toString(),
+                                dataSnapshot.child("password").getValue().toString(),
+                                dataSnapshot.child("location").getValue().toString(),
+                                dataSnapshot.child("phone").getValue().toString(),
+                                dataSnapshot.child("userType").getValue().toString());
+
+                        setEmployeeTasks();
+                        }
                 }
                 else {
                     Toast.makeText(getApplicationContext(), "Else called", Toast.LENGTH_SHORT).show();

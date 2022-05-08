@@ -60,29 +60,29 @@ public class SiteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.site);
 //        helper = new EmployeesManagementDbHelper(this);
-        setDepatementParameter();
-        setEmployeeList();
-        Intent intent = getIntent();
-        deptId = intent.getStringExtra("departmentId");
-        employees.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Intent intent = new Intent(SiteActivity.this, CleanerActivity.class);
-                intent.putExtra("employeeId", id);
-                startActivityForResult(intent, EMP_REQUEST);
-            }
-        });
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(SiteActivity.this, CleanerCreation.class);
-                intent.putExtra("departmentId", deptId);
-                startActivityForResult(intent, EMP_REQUEST);
-            }
-        });
+//        setDepatementParameter();
+//        setEmployeeList();
+//        Intent intent = getIntent();
+//        deptId = intent.getStringExtra("departmentId");
+//        employees.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+//                Intent intent = new Intent(SiteActivity.this, CleanerActivity.class);
+//                intent.putExtra("employeeId", id);
+//                startActivityForResult(intent, EMP_REQUEST);
+//            }
+//        });
+//
+//        FloatingActionButton fab = findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent = new Intent(SiteActivity.this, CleanerCreation.class);
+//                intent.putExtra("departmentId", deptId);
+//                startActivityForResult(intent, EMP_REQUEST);
+//            }
+//        });
 
 //        displayTaskList();
 

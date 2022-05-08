@@ -1,6 +1,7 @@
 package com.example.android.employeesmanagementsoftware.taskDB;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -27,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 
-public class TasksFragment extends Fragment {
+public class TasksFragment extends Fragment implements SelectTaskListener{
     DatabaseReference dbref;
     private static TasksFragment fragment ;
     private EmployeesManagementDbHelper employeeDBHelper;
@@ -77,7 +78,7 @@ public class TasksFragment extends Fragment {
 
                     RecyclerView recyclerView =  view.findViewById(R.id.task_list);
                     recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                    mAdapter = new TasksAdapter(getActivity(),mValues);
+                    mAdapter = new TasksAdapter(getActivity(),mValues, TasksFragment.this);
                     recyclerView.setAdapter(mAdapter);
                 }
             }
@@ -139,5 +140,12 @@ public class TasksFragment extends Fragment {
     }
 
 
+    @Override
+    public void onItemClicked(Task task) {
+        Toast.makeText(getActivity(), "TaskNAme - "+task.getTaskName(), Toast.LENGTH_SHORT).show();         //
 
+        Intent intent = new Intent(TasksFragment.this.getActivity(), TaskActivity.class);
+        intent.putExtra("task_name", task.getTaskName());
+        startActivity(intent);
+    }
 }

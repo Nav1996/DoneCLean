@@ -27,6 +27,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
@@ -52,7 +53,7 @@ public class TaskActivity extends AppCompatActivity implements Evaluation.Evalua
 
     DatabaseReference dbref;
     TaskClass taskobj;
-    String task_id;
+    String task_id, task_name;
     ListView employees;
 
     @Override
@@ -63,6 +64,7 @@ public class TaskActivity extends AppCompatActivity implements Evaluation.Evalua
 
         Intent intent = getIntent();
         task_id = intent.getStringExtra("task_id");
+        task_name = intent.getStringExtra("task_name");
 //        Toast.makeText(getApplicationContext(), "Task - " + task_id, Toast.LENGTH_SHORT).show();
 
         getTaskDetails(task_id);
@@ -78,6 +80,7 @@ public class TaskActivity extends AppCompatActivity implements Evaluation.Evalua
 //         position = intent.getExtras().getInt("position");
 //         tasks = (ArrayList<Task>) getIntent().getSerializableExtra("data");
 //         taskID = getIntent().getExtras().getLong("taskId");
+
 //
         taskobj = new TaskClass();
         ArrayList<String> cleaners = new ArrayList<>();
@@ -85,41 +88,84 @@ public class TaskActivity extends AppCompatActivity implements Evaluation.Evalua
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd G 'at' HH:mm:ss z");
         String currentDateandTime = sdf.format(new Date());
 
-        dbref = FirebaseDatabase.getInstance().getReference().child("Tasks").child(task_id);
+        if(task_name == null) {
 
-        dbref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
-                taskobj.setName(dataSnapshot.child("name").getValue().toString());
-                taskobj.setDeadline(dataSnapshot.child("deadline").getValue().toString());
-                taskobj.setDescription(dataSnapshot.child("description").getValue().toString());
-                taskobj.setId(dataSnapshot.child("id").getValue().toString());
-                taskobj.setDone((boolean) dataSnapshot.child("done").getValue());
-//                taskobj.setEvaluation(dataSnapshot.child("evaluation").getValue());
-                taskobj.setEmployees(dataSnapshot.child("employees").getValue().toString());
+            dbref = FirebaseDatabase.getInstance().getReference().child("Tasks").child(task_id);
 
-                datetext.setText(currentDateandTime);
-                descriptiontext.setText(taskobj.getDescription());
-                deadlinetext.setText(taskobj.getDeadline());
-                cleaners.add(taskobj.getEmployees());
-                if (taskobj.isDone()) {
-                    mRatingBar.setRating(taskobj.getEvaluation());
-                    mRatingBar.setVisibility(View.VISIBLE);
-                    mEvaluation.setVisibility(View.VISIBLE);
+            dbref.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
+                    taskobj.setName(dataSnapshot.child("name").getValue().toString());
+                    taskobj.setDeadline(dataSnapshot.child("deadline").getValue().toString());
+                    taskobj.setDescription(dataSnapshot.child("description").getValue().toString());
+                    taskobj.setId(dataSnapshot.child("id").getValue().toString());
+                    taskobj.setDone((boolean) dataSnapshot.child("done").getValue());
+    //                taskobj.setEvaluation(dataSnapshot.child("evaluation").getValue());
+                    taskobj.setEmployees(dataSnapshot.child("employees").getValue().toString());
+
+                    datetext.setText(currentDateandTime);
+                    descriptiontext.setText(taskobj.getDescription());
+                    deadlinetext.setText(taskobj.getDeadline());
+                    cleaners.add(taskobj.getEmployees());
+                    if (taskobj.isDone()) {
+                        mRatingBar.setRating(taskobj.getEvaluation());
+                        mRatingBar.setVisibility(View.VISIBLE);
+                        mEvaluation.setVisibility(View.VISIBLE);
+                    }
+
+                    ArrayAdapter<String> adapterClean = new ArrayAdapter<>(getApplicationContext(),
+                            android.R.layout.simple_list_item_1, cleaners);
+                    employees.setAdapter(adapterClean);
+                    onEmployeeClicked();
                 }
 
-                ArrayAdapter<String> adapterClean = new ArrayAdapter<>(getApplicationContext(),
-                        android.R.layout.simple_list_item_1, cleaners);
-                employees.setAdapter(adapterClean);
-                onEmployeeClicked();
-            }
+                @Override
+                public void onCancelled(@NonNull @NotNull DatabaseError databaseError) {
 
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError databaseError) {
+                }
+            });
+        }
+        else {
+            Query query = FirebaseDatabase.getInstance().getReference().child("Tasks").orderByChild("name").equalTo(task_name);
 
-            }
-        });
-//
+            query.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+
+                            taskobj.setName(dataSnapshot.child("name").getValue().toString());
+                            taskobj.setDeadline(dataSnapshot.child("deadline").getValue().toString());
+                            taskobj.setDescription(dataSnapshot.child("description").getValue().toString());
+                            taskobj.setId(dataSnapshot.child("id").getValue().toString());
+                            taskobj.setDone((boolean) dataSnapshot.child("done").getValue());
+                            //                taskobj.setEvaluation(dataSnapshot.child("evaluation").getValue());
+                            taskobj.setEmployees(dataSnapshot.child("employees").getValue().toString());
+
+                            datetext.setText(currentDateandTime);
+                            descriptiontext.setText(taskobj.getDescription());
+                            deadlinetext.setText(taskobj.getDeadline());
+                            cleaners.add(taskobj.getEmployees());
+                            if (taskobj.isDone()) {
+                                mRatingBar.setRating(taskobj.getEvaluation());
+                                mRatingBar.setVisibility(View.VISIBLE);
+                                mEvaluation.setVisibility(View.VISIBLE);
+                            }
+
+                            ArrayAdapter<String> adapterClean = new ArrayAdapter<>(getApplicationContext(),
+                                    android.R.layout.simple_list_item_1, cleaners);
+                            employees.setAdapter(adapterClean);
+                            onEmployeeClicked();
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull @NotNull DatabaseError databaseError) {
+
+                }
+            });
+        }
 
 //        setEmployees();
 

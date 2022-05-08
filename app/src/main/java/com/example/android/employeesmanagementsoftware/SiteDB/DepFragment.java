@@ -1,6 +1,7 @@
 package com.example.android.employeesmanagementsoftware.SiteDB;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -32,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class DepFragment extends Fragment {
+public class DepFragment extends Fragment implements SelectSiteListener{
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
@@ -96,11 +97,9 @@ public class DepFragment extends Fragment {
                         mValues.add(site);
                     }
 
-                    Toast.makeText(getContext(), "Sites- "+mValues, Toast.LENGTH_SHORT).show();
-
                     RecyclerView recyclerView =  view.findViewById(R.id.site_list);
                     recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                    mAdapter = new MySiteRecyclerViewAdapter(mValues, getActivity());
+                    mAdapter = new MySiteRecyclerViewAdapter(mValues, getActivity(), DepFragment.this);
                     recyclerView.setAdapter(mAdapter);
                 }
             }
@@ -129,6 +128,15 @@ public class DepFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onItemClicked(SiteItem item) {
+        Toast.makeText(getActivity(), "Sitename - "+item.getName(), Toast.LENGTH_SHORT).show();         //
+
+        Intent intent = new Intent(DepFragment.this.getActivity(), SiteActivity.class);
+        intent.putExtra("departmentId", item.getId());
+        startActivity(intent);
     }
 
 

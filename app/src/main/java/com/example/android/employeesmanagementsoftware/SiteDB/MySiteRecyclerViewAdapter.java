@@ -3,6 +3,7 @@ package com.example.android.employeesmanagementsoftware.SiteDB;
 import android.content.Context;
 import android.content.Intent;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import com.example.android.employeesmanagementsoftware.SiteDB.DepFragment.OnListFragmentInteractionListener;
 import com.example.android.employeesmanagementsoftware.SiteDB.SiteRowData.SiteItem;
 import com.example.android.employeesmanagementsoftware.R;
+import com.example.android.employeesmanagementsoftware.taskDB.SelectTaskListener;
 
 import java.util.List;
 
@@ -19,12 +21,14 @@ public class MySiteRecyclerViewAdapter extends RecyclerView.Adapter<MySiteRecycl
 
     private final List<SiteItem> mValues;
     private final Context mListener;
+    private SelectSiteListener listener;
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
-    public MySiteRecyclerViewAdapter(List<SiteItem> items, Context listener) {
+    public MySiteRecyclerViewAdapter(List<SiteItem> items, Context listener, SelectSiteListener listener2) {
         mValues = items;
         mListener = listener;
+        this.listener = listener2;
     }
 
     @Override
@@ -54,6 +58,13 @@ public class MySiteRecyclerViewAdapter extends RecyclerView.Adapter<MySiteRecycl
 
             }
         });
+
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onItemClicked(mValues.get(position));
+            }
+        });
     }
 
     @Override
@@ -65,6 +76,7 @@ public class MySiteRecyclerViewAdapter extends RecyclerView.Adapter<MySiteRecycl
         public final View mView;
         public final TextView mName;
         public final TextView mdescriptionView;
+        public CardView cardView;
         public SiteItem mItem;
 
         public ViewHolder(View view) {
@@ -72,6 +84,7 @@ public class MySiteRecyclerViewAdapter extends RecyclerView.Adapter<MySiteRecycl
             mView = view;
             mName = (TextView) view.findViewById(R.id.department_name);
             mdescriptionView = (TextView) view.findViewById(R.id.department_description);
+            cardView = view.findViewById(R.id.card_view);
         }
 
         @Override
