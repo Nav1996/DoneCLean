@@ -119,6 +119,7 @@ public class SiteCreation extends AppCompatActivity {
                                     readreff.setValue(site);
                                     Toast.makeText(getApplicationContext(), "Successfuly added Site", Toast.LENGTH_SHORT).show();
                                     actionSave(true, view, false, dep_id);
+
                                 }
 
                                 @Override
@@ -164,6 +165,7 @@ public class SiteCreation extends AppCompatActivity {
         Intent intent2 = new Intent(getBaseContext(), SiteActivity.class);
         intent2.putExtra("departmentId", dep_id);
         startActivity(intent2);
+        finish();
 //        if(flag){
 //            if(!isEdit)
 //            Snackbar.make(v, "ENTERED SUCCESSFULLY", Snackbar.LENGTH_LONG).setAction("", null).show();

@@ -267,6 +267,7 @@ public class TaskActivity extends AppCompatActivity implements Evaluation.Evalua
                             Toast.makeText(getApplicationContext(), "Deleted Successfully", Toast.LENGTH_SHORT).show();
 
                             Intent intent = new Intent(TaskActivity.this, StartingPageActivity.class);
+                            startActivity(intent);
                         }
                     }
 

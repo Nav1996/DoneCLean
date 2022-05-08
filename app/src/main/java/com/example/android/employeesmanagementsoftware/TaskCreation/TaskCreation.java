@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+
+import com.example.android.employeesmanagementsoftware.StartingPageActivity;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
@@ -52,7 +54,6 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
     private Task task;
     public TaskCreation() {
         employees = new TreeSet<>();
-
     }
 
     DatabaseReference dbref;
@@ -68,6 +69,7 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
 
     ArrayList<String> cleaners = new ArrayList<>();
     String selectSites;
+    String editSelectedSite, editSelectedEmp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +98,7 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
 //            task = (Task) taskData.get("task");
 //        }
 
-        if (intent.hasExtra("task_id")) {
+        if (isEdit) {
             taskID = intent.getStringExtra("task_id");
 
             setTexts(taskID);
@@ -114,6 +116,8 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
                     name.setText(snapshot.child("name").getValue().toString());
                     date.setText(snapshot.child("deadline").getValue().toString());
                     description.setText(snapshot.child("description").getValue().toString());
+                    editSelectedEmp = snapshot.child("employees").getValue().toString();
+                    editSelectedSite = snapshot.child("site").getValue().toString();
                 }
             }
 
@@ -131,6 +135,10 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 selectSites = departments.get(i);
                 Toast.makeText(getApplicationContext(), "Site"+selectSites, Toast.LENGTH_SHORT).show();
+
+                if (isEdit) {
+                    editSelectedSite = departments.get(i);
+                }
             }
         });
     }
@@ -152,6 +160,9 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
                 Toast.makeText(getApplicationContext(), "Cleaner " +cleaners.get(i), Toast.LENGTH_SHORT).show();
                 try {
                     selectedCleaners = cleaners.get(i);
+                    if (isEdit) {
+                        editSelectedEmp = cleaners.get(i);
+                    }
                 }
                 catch (Exception e) {
 
@@ -256,7 +267,7 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
 
         if (item.getItemId() == R.id.save_task_creation_button) {
             if (isEdit) {
-                taskobj = new TaskClass(taskID, name, description, deadline, selectedCleaners, selectSites, false, 0);
+                taskobj = new TaskClass(taskID, name, description, deadline, editSelectedEmp, editSelectedSite, false, 0);
                 dbref = FirebaseDatabase.getInstance().getReference().child("Tasks").child(taskID);
 
                 dbref.addValueEventListener(new ValueEventListener() {
@@ -266,7 +277,10 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
                         Toast.makeText(getApplicationContext(), "Task Edited successfully", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(TaskCreation.this, TaskActivity.class);
                         intent.putExtra("task_id", taskID);
+//                        String namenull = null;
+//                        intent.putExtra("task_name", namenull);
                         startActivity(intent);
+                        finish();
                     }
 
                     @Override

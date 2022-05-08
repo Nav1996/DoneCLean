@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+
+import com.example.android.employeesmanagementsoftware.StartingPageActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -248,6 +250,8 @@ public class SiteActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
                         dbref.removeValue();
                         Toast.makeText(getApplicationContext(), "Deleted sie successfully " + deptId, Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(SiteActivity.this, StartingPageActivity.class);
+                        startActivity(intent);
                     }
 
                     @Override
