@@ -56,7 +56,7 @@ public class CleanerActivity extends AppCompatActivity {
     private long employeeId;
     private String picturePath;
     private boolean imgChanged = false;
-    String emp_id;
+    String emp_name;
     Member cleaner;
     DatabaseReference dbref;
     ArrayList<String> tasks;
@@ -67,7 +67,7 @@ public class CleanerActivity extends AppCompatActivity {
         setContentView(R.layout.cleaner);
 
         Intent intent2 = getIntent();
-        emp_id = intent2.getStringExtra("Emp_ID");
+        emp_name = intent2.getStringExtra("Emp_ID");
 
         tasksList = findViewById(R.id.tasks_list);
         name = findViewById(R.id.employee_name);
@@ -110,7 +110,7 @@ public class CleanerActivity extends AppCompatActivity {
         tasks = new ArrayList<>();
 
         Query query = FirebaseDatabase.getInstance().getReference().child("Tasks").
-                orderByChild("employees").equalTo(emp_id);
+                orderByChild("employees").equalTo(emp_name);
 
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -216,7 +216,7 @@ public class CleanerActivity extends AppCompatActivity {
     }
 
     private void showDeleteConfirmationDialog() {
-        Query query = FirebaseDatabase.getInstance().getReference().child("member").orderByChild("name").equalTo(emp_id);
+        Query query = FirebaseDatabase.getInstance().getReference().child("member").orderByChild("name").equalTo(emp_name);
         //setting data of employee
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.deleteEmp);
@@ -253,7 +253,7 @@ public class CleanerActivity extends AppCompatActivity {
 
     private void setEmployee() {
 //        Cursor cursor = helper.getEmployee(employeeId);
-        Query query = FirebaseDatabase.getInstance().getReference().child("member").orderByChild("name").equalTo(emp_id);
+        Query query = FirebaseDatabase.getInstance().getReference().child("member").orderByChild("name").equalTo(emp_name);
         //setting data of employee
         query.addValueEventListener(new ValueEventListener() {
             @Override

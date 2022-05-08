@@ -92,7 +92,7 @@ public class CleanerMainPage extends AppCompatActivity {
         tasksList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(CleanerMainPage.this, AddPictures.class);
+                Intent intent = new Intent(CleanerMainPage.this, CleanerTask.class);
                 intent.putExtra("Task_ID", taskIDs.get(i));
                 startActivity(intent);
             }

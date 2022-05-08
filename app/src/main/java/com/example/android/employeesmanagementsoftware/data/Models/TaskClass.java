@@ -4,22 +4,31 @@ import java.util.ArrayList;
 
 public class TaskClass {
     private String id, name, description, deadline;
-    private String employees;
+    private String employees, site;
 
     private boolean done;
     private int  evaluation;
+
+    public String getSite() {
+        return site;
+    }
+
+    public void setSite(String site) {
+        this.site = site;
+    }
 
     public TaskClass() {
         this.done = false;
     }
 
     public TaskClass(String id, String name, String description, String deadline,
-                     String employees, boolean done, int evaluation) {
+                     String employees, String site, boolean done, int evaluation) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.deadline = deadline;
         this.employees = employees;
+        this.site = site;
         this.done = done;
         this.evaluation = evaluation;
     }

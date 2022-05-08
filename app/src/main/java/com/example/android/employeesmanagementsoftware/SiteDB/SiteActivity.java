@@ -36,6 +36,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+
 //need to attach her job with database
 // convert actvity to fregment
 
@@ -47,13 +49,15 @@ public class SiteActivity extends AppCompatActivity {
     private final int EMP_REQUEST = 1;
     private EmployeesManagementDbHelper helper;
     private TextView description;
-    private ListView employees;
+    private ListView employees, tasks;
     private CleanerAdapter adapterEmp;
     private long departmentId;
     private String deptId;
     private String depName;
     private DepFragment depFragment = DepFragment.newInstance(0);
     DatabaseReference dbref;
+    String site_name;
+    ArrayList<String> employees_list, tasks_list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,8 +66,18 @@ public class SiteActivity extends AppCompatActivity {
 //        helper = new EmployeesManagementDbHelper(this);
 //        setDepatementParameter();
 //        setEmployeeList();
-//        Intent intent = getIntent();
-//        deptId = intent.getStringExtra("departmentId");
+        Intent intent = getIntent();
+        deptId = intent.getStringExtra("departmentId");
+
+        employees_list = new ArrayList<>();
+        tasks_list = new ArrayList<>();
+
+        description =  findViewById(R.id.description);
+        tasks = findViewById(R.id.cleaner_tasks_list);
+        employees = findViewById(R.id.tasks_list);
+
+        getDepartment();
+        setTaskList();
 //        employees.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //
 //            @Override
@@ -73,23 +87,69 @@ public class SiteActivity extends AppCompatActivity {
 //                startActivityForResult(intent, EMP_REQUEST);
 //            }
 //        });
-//
-//        FloatingActionButton fab = findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent = new Intent(SiteActivity.this, CleanerCreation.class);
-//                intent.putExtra("departmentId", deptId);
-//                startActivityForResult(intent, EMP_REQUEST);
-//            }
-//        });
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(SiteActivity.this, CleanerCreation.class);
+                intent.putExtra("departmentId", deptId);
+                startActivityForResult(intent, EMP_REQUEST);
+            }
+        });
 
 //        displayTaskList();
 
     }
 
+    private void setTaskList() {
+        Query query = FirebaseDatabase.getInstance().getReference().child("Tasks").orderByChild("site").equalTo(site_name);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        tasks_list.add(snapshot.child("name").getValue().toString());
+                        employees_list.add(snapshot.child("employees").getValue().toString());
+                    }
+
+                    ArrayAdapter<String> adapterClean = new ArrayAdapter<>(getApplicationContext(),
+                            android.R.layout.simple_list_item_1, tasks_list);
+                    tasks.setAdapter(adapterClean);
+
+                    ArrayAdapter<String> adapterEmployees = new ArrayAdapter<>(getApplicationContext(),
+                            android.R.layout.simple_list_item_1, employees_list);
+                    employees.setAdapter(adapterClean);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void getDepartment() {
+        DatabaseReference dbref = FirebaseDatabase.getInstance().getReference().child("site").child(deptId);
+        dbref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
+                description.setText(dataSnapshot.child("description").getValue().toString());
+                setTitle(dataSnapshot.child("name").getValue().toString());
+                site_name = dataSnapshot.child("name").getValue().toString();
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+
     private void setDepatementParameter() {
-        description =  findViewById(R.id.description);
+
         Intent intent = getIntent();
         String departmentId = intent.getStringExtra("departmentId");
 

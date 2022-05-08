@@ -57,9 +57,9 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
 
     DatabaseReference dbref;
     boolean isEdit;
-    private Spinner spinner;
+    Spinner spinner;
     private EditText name, date, description;
-    ListView employeeslist;
+    ListView employeeslist, sitelist;
     String dept;
     TaskClass taskobj;
     ArrayList<String> departments;
@@ -94,26 +94,22 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
         name = findViewById(R.id.task_name_edit);
         date = findViewById(R.id.task_deadline_edit);
         description = findViewById(R.id.department_description_edit_text);
-        spinner = findViewById(R.id.departmentDropDown);
+        sitelist = findViewById(R.id.departmentlist);
         employeeslist = findViewById(R.id.employees_List);
 //
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, departments);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                selectSites = departments.get(i);
-                Toast.makeText(getApplicationContext(), "Spinner "+selectSites, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
+//        spinner.setAdapter(adapter);
+//        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+//                selectSites = departments.get(i);
+//                Toast.makeText(getApplicationContext(), "Spinner "+selectSites, Toast.LENGTH_SHORT).show();
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> adapterView) {
+//
+//            }
+//        });
 
 
 //        util=new TaskCreationUtil(this,employeeDBHelper);
@@ -123,6 +119,17 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
 //                initSpinner(adapterPool);
 
     }
+
+    private void getSite() {
+        sitelist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                selectSites = departments.get(i);
+                Toast.makeText(getApplicationContext(), "Site"+selectSites, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     private void setListview(ArrayList cleaners) {
         ArrayAdapter<String> adapterClean = new ArrayAdapter<>(getApplicationContext(),
@@ -164,6 +171,13 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
                             Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
                         }
                     }
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
+                            android.R.layout.simple_spinner_item, departments);
+
+                    sitelist.setAdapter(adapter);
+
+                    getSite();
                 }
                 else {
                     Toast.makeText(getApplicationContext(), "ERRORR", Toast.LENGTH_SHORT).show();
@@ -231,7 +245,7 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
         String deadline = deadlineLayout.getEditText().getText().toString();
 
         String rand_id = UUID.randomUUID().toString();
-        taskobj = new TaskClass(rand_id, name, description, deadline, selectedCleaners, false, 0);
+        taskobj = new TaskClass(rand_id, name, description, deadline, selectedCleaners, selectSites, false, 0);
 
         dbref = FirebaseDatabase.getInstance().getReference().child("Tasks");
 
@@ -253,31 +267,6 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
                 }
             });
         }
-
-//
-//
-//           dbref.addValueEventListener(new ValueEventListener() {
-//               @Override
-//               public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
-//                   Calendar calendar = Calendar.getInstance();
-//                   String dateselected = calendar.get(Calendar.DAY_OF_MONTH)+"/"+calendar.get(Calendar.MONTH)+"/"
-//                           +calendar.get(Calendar.YEAR);
-//
-//                   taskobj = new TaskClass(nameLayout.getEditText().getText().toString(), descriptionLayout.getEditText().getText().toString(),
-//                           dateselected, selectedSites, selectedCleaners);
-//                   dbref.push().setValue(taskobj);
-//                   Toast.makeText(getApplicationContext(), "Task saved successfully", Toast.LENGTH_SHORT).show();
-//               }
-//
-//               @Override
-//               public void onCancelled(@NonNull @NotNull DatabaseError databaseError) {
-//                   Toast.makeText(getApplicationContext(), "Errorrr", Toast.LENGTH_SHORT).show();
-//               }
-//           });
-            //add a new task or update an existing one with the extracted data
-//            commander.saveData(nameLayout.getEditText().getText().toString(), 0, descriptionLayout.getEditText().getText().toString(),
-//                    deadlineLayout.getEditText().getText().toString(), new ArrayList<>(employees));
-//           finish();
 
         return true;
 
@@ -303,14 +292,13 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
                 , mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.DAY_OF_MONTH)).show();
     }
 
-
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        selectSites = (String) adapterView.getItemAtPosition(i);
+        Toast.makeText(getApplicationContext(), "Sited", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
-
+        Toast.makeText(getApplicationContext(), "Not Sited", Toast.LENGTH_SHORT).show();
     }
 }

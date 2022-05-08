@@ -443,6 +443,12 @@ public class AddPictures extends AppCompatActivity {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
 
+//         Code for showing progressDialog while uploading
+        ProgressDialog progressDialog
+                = new ProgressDialog(this);
+        progressDialog.setTitle("Uploading...");
+        progressDialog.show();
+
         StorageReference stref = storageReference.child(task_id+ "/" + imageFileName);
 
         // Get the data from an ImageView as bytes
@@ -465,8 +471,20 @@ public class AddPictures extends AppCompatActivity {
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 Toast.makeText(getApplicationContext(), "Successfully uploaded", Toast.LENGTH_SHORT).show();
                 uploadToDB(imageFileName);
+                progressDialog.dismiss();
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
 //                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+            }
+        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(@NonNull @NotNull UploadTask.TaskSnapshot snapshot) {
+                double progress
+                            = (100.0
+                            * snapshot.getBytesTransferred()
+                            / snapshot.getTotalByteCount());
+                    progressDialog.setMessage(
+                            "Uploaded "
+                                    + (int)progress + "%");
             }
         });
     }
