@@ -85,16 +85,21 @@ public class DepFragment extends Fragment implements SelectSiteListener{
             public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        SiteItem site = new SiteItem();
+                        try {
+                            SiteItem site = new SiteItem();
 
-                        site.setId(snapshot.child("id").getValue().toString());
-                        site.setName(snapshot.child("name").getValue().toString());
-                        site.setDetails(snapshot.child("description").getValue().toString());
+                            site.setId(snapshot.child("id").getValue().toString());
+                            site.setName(snapshot.child("name").getValue().toString());
+                            site.setDetails(snapshot.child("description").getValue().toString());
 //                        site.setId(snapshot.child("id").getValue().toString());
 //                        site.setName(snapshot.child("name").getValue().toString());
 //                        site.setDetails(snapshot.child("description").getValue().toString());
 
-                        mValues.add(site);
+                            mValues.add(site);
+                        }
+                        catch (Exception e) {
+                            Toast.makeText(getActivity(), "No data", Toast.LENGTH_SHORT).show();
+                        }
                     }
 
                     RecyclerView recyclerView =  view.findViewById(R.id.site_list);

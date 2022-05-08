@@ -68,12 +68,16 @@ public class TasksFragment extends Fragment implements SelectTaskListener{
             public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        Task task = new Task();
-                        task.setTaskName(snapshot.child("name").getValue().toString());
-                        task.setTaskDetails(snapshot.child("description").getValue().toString());
-                        task.setTaskDeadline(snapshot.child("deadline").getValue().toString());
+                        try {
+                            Task task = new Task();
+                            task.setTaskName(snapshot.child("name").getValue().toString());
+                            task.setTaskDetails(snapshot.child("description").getValue().toString());
+                            task.setTaskDeadline(snapshot.child("deadline").getValue().toString());
 
-                        mValues.add(task);
+                            mValues.add(task);
+                        }catch (Exception e) {
+                            Toast.makeText(getActivity(), "No data", Toast.LENGTH_SHORT).show();
+                        }
                     }
 
                     RecyclerView recyclerView =  view.findViewById(R.id.task_list);
