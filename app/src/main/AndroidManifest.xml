@@ -38,7 +38,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Cleaner.CleanerTask"></activity>
+        <activity android:name=".taskDB.TaskCheckImages"></activity>
+        <activity android:name=".Cleaner.CleanerTask" />
         <activity android:name=".Cleaner.AddPictures" />
 
         <provider

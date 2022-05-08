@@ -45,6 +45,7 @@ public class CleanerTask extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(CleanerTask.this, AddPictures.class);
                 intent.putExtra("Task_ID", taskId);
+                intent.putExtra("Done", false);
                 startActivity(intent);
             }
         });
@@ -54,6 +55,7 @@ public class CleanerTask extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(CleanerTask.this, AddPictures.class);
                 intent.putExtra("Task_ID", taskId);
+                intent.putExtra("Done", true);
                 startActivity(intent);
             }
         });
@@ -77,7 +79,7 @@ public class CleanerTask extends AppCompatActivity {
 
                             dataSnapshot.getRef().removeValue();
                             Toast.makeText(getApplicationContext(), "Task removed successfully", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(CleanerTask.this, StartingPageActivity.class);
+                            Intent intent = new Intent(CleanerTask.this, CleanerMainPage.class);
                             startActivity(intent);
                         }
                     });

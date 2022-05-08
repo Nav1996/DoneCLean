@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -51,6 +52,7 @@ public class TaskActivity extends AppCompatActivity implements Evaluation.Evalua
     private long taskID;
     private CleanerAdapter adapter;
 
+    Button checkImages;
     DatabaseReference dbref;
     TaskClass taskobj;
     String task_id, task_name;
@@ -75,6 +77,7 @@ public class TaskActivity extends AppCompatActivity implements Evaluation.Evalua
         mRatingBar = findViewById(R.id.ratingBar_task);
         mEvaluation = findViewById(R.id.evaluation);
         employees = findViewById(R.id.cleaner_tasks_list);
+        checkImages = findViewById(R.id.checkImages);
 
 //         Intent intent= getIntent();
 //         position = intent.getExtras().getInt("position");
@@ -117,6 +120,7 @@ public class TaskActivity extends AppCompatActivity implements Evaluation.Evalua
                             android.R.layout.simple_list_item_1, cleaners);
                     employees.setAdapter(adapterClean);
                     onEmployeeClicked();
+                    checkTaskImages();
                 }
 
                 @Override
@@ -133,7 +137,7 @@ public class TaskActivity extends AppCompatActivity implements Evaluation.Evalua
                 public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                     if (snapshot.exists()) {
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-
+                            task_id = dataSnapshot.child("id").getValue().toString();
                             taskobj.setName(dataSnapshot.child("name").getValue().toString());
                             taskobj.setDeadline(dataSnapshot.child("deadline").getValue().toString());
                             taskobj.setDescription(dataSnapshot.child("description").getValue().toString());
@@ -156,6 +160,7 @@ public class TaskActivity extends AppCompatActivity implements Evaluation.Evalua
                                     android.R.layout.simple_list_item_1, cleaners);
                             employees.setAdapter(adapterClean);
                             onEmployeeClicked();
+                            checkTaskImages();
                         }
                     }
                 }
@@ -169,6 +174,18 @@ public class TaskActivity extends AppCompatActivity implements Evaluation.Evalua
 
 //        setEmployees();
 
+
+    }
+
+    public void checkTaskImages() {
+        checkImages.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent1 = new Intent(TaskActivity.this, TaskCheckImages.class);
+                intent1.putExtra("TaskID", task_id);
+                startActivity(intent1);
+            }
+        });
     }
 
     private void getTaskDetails(String task_id) {

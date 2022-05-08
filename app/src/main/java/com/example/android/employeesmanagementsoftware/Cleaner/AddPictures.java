@@ -74,7 +74,7 @@ public class AddPictures extends AppCompatActivity {
         Intent intent = getIntent();
         task_id = intent.getStringExtra("Task_ID");
 
-        isStarted = false;
+        isStarted = intent.getBooleanExtra("Done", false);
 
         ActionBar actionBar;
         actionBar = getSupportActionBar();
@@ -89,7 +89,7 @@ public class AddPictures extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
-        checkIfStarted();
+//        checkIfStarted();
 
         selectedImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,58 +128,7 @@ public class AddPictures extends AppCompatActivity {
         });
 
     }
-//
-//    private void uploadImage() {
-//        if (filePath != null) {
-//
-//            // Code for showing progressDialog while uploading
-//            ProgressDialog progressDialog
-//                    = new ProgressDialog(this);
-//            progressDialog.setTitle("Uploading...");
-//            progressDialog.show();
-//
-//            // Defining the child of storageReference
-//            String randID = UUID.randomUUID().toString();
-//            StorageReference ref = storageReference.child(task_id+ "/" + randID);
-//
-//            // adding listeners on upload
-//            // or failure of image
-//            ref.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//                @Override
-//                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                    // Image uploaded successfully
-//                    // Dismiss dialog
-//                    progressDialog.dismiss();
-//                    Toast.makeText(AddPictures.this, "Image Uploaded!!", Toast.LENGTH_SHORT).show();
-//
-//                    uploadToDB(randID);
-//                }
-//            }).addOnFailureListener(new OnFailureListener() {
-//                @Override
-//                public void onFailure(@NonNull Exception e)
-//                {
-//
-//                    // Error, Image not uploaded
-//                    progressDialog.dismiss();
-//                    Toast.makeText(AddPictures.this, "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
-//                }
-//            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-//                // Progress Listener for loading
-//                // percentage on the dialog box
-//                @Override
-//                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-//                    double progress
-//                            = (100.0
-//                            * taskSnapshot.getBytesTransferred()
-//                            / taskSnapshot.getTotalByteCount());
-//                    progressDialog.setMessage(
-//                            "Uploaded "
-//                                    + (int)progress + "%");
-//                }
-//            });
-//        }
-//    }
-//
+
     private void uploadToDB(String randID) {
         DatabaseReference dbref = FirebaseDatabase.getInstance().getReference().child("uploads").child(task_id);
         Upload upload = new Upload();
@@ -190,7 +139,7 @@ public class AddPictures extends AppCompatActivity {
                 if(isStarted) {
                     upload.setId(dataSnapshot.child("id").getValue().toString());
                     upload.setStart(dataSnapshot.child("start").getValue().toString());
-                    upload.setEnd(randID);
+                    upload.setEnd(null);
 
                     dbref.setValue(upload);
                 }
@@ -212,103 +161,12 @@ public class AddPictures extends AppCompatActivity {
             }
         });
     }
-//
-//    private File createImageFile() throws IOException {
-//        // Create an image file name
-//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-//        String imageFileName = "JPEG_" + timeStamp + "_";
-//        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-//        File image = File.createTempFile(
-//                imageFileName,  /* prefix */
-//                ".jpg",         /* suffix */
-//                storageDir      /* directory */
-//        );
-//
-//        // Save a file: path for use with ACTION_VIEW intents
-//        currentPhotoPath = image.getAbsolutePath();
-//        return image;
-//    }
-//
-//    private void selectedImage() {
-////        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-////        Toast.makeText(getApplicationContext(), "photo ", Toast.LENGTH_SHORT).show();
-////        // Ensure that there's a camera activity to handle the intent
-////        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-////            // Create the File where the photo should go
-////            File photoFile = null;
-////            try {
-////                photoFile = createImageFile();
-////            } catch (IOException ex) {
-////                // Error occurred while creating the File
-////
-////            }
-////            // Continue only if the File was successfully created
-////            if (photoFile != null) {
-////                Uri photoURI = FileProvider.getUriForFile(this,
-////                        "com.example.android.fileprovider",
-////                        photoFile);
-////                Toast.makeText(getApplicationContext(), "photo "+photoURI, Toast.LENGTH_SHORT).show();
-////                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-////                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-////            }
-////        }
-//        // Defining Implicit Intent to mobile gallery
-//        Intent intent = new Intent();
-//        intent.setType("image/*");
-//        intent.setAction(Intent.ACTION_GET_CONTENT);
-//        startActivityForResult(
-//                Intent.createChooser(
-//                        intent,
-//                        "Select Image from here..."),
-//                PICK_IMAGE_REQUEST);
-//    }
-//
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        Toast.makeText(getApplicationContext(), "GetData "+data.getData(), Toast.LENGTH_SHORT).show();
-//        Toast.makeText(getApplicationContext(), "Request "+requestCode, Toast.LENGTH_SHORT).show();
-//        Toast.makeText(getApplicationContext(), "Result "+resultCode, Toast.LENGTH_SHORT).show();
-//        Toast.makeText(getApplicationContext(), "Data "+data, Toast.LENGTH_SHORT).show();
-//        if (requestCode == PICK_IMAGE_REQUEST
-//                && resultCode == RESULT_OK
-//                && data != null
-//                && data.getData() != null) {
-//
-//            Toast.makeText(getApplicationContext(), "Onactivity called", Toast.LENGTH_SHORT).show();
-//            // Get the Uri of data
-//            filePath = data.getData();
-//            try {
-//
-//                // Setting image on image view using Bitmap
-//                Bitmap bitmap = MediaStore
-//                        .Images
-//                        .Media
-//                        .getBitmap(
-//                                getContentResolver(),
-//                                filePath);
-//                selectedImage.setImageBitmap(bitmap);
-//            }
-//
-//            catch (IOException e) {
-//                // Log the exception
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public void imagecapture() {
         Toast.makeText(this, "Redirecting to camera", Toast.LENGTH_SHORT).show();
         askpermission();
     }
-////
-////    public void submitbtn(View view) {
-////
-////    }
-////
+//
     public void askpermission() {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.CAMERA}, CAMERA_PERM_CODE);
@@ -350,98 +208,21 @@ public class AddPictures extends AppCompatActivity {
 
                 Bitmap image = (Bitmap) data.getExtras().get("data");
                 selectedImage.setImageBitmap(image);
-//                File f = new File(currentPhotoPath);
-//                selectedImage.setImageURI(Uri.fromFile(f));
-//                Log.d("tag", "ABsolute Url of Image is " + Uri.fromFile(f));
-//
-//                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-//                Uri contentUri = Uri.fromFile(f);
-//                mediaScanIntent.setData(contentUri);
-//                this.sendBroadcast(mediaScanIntent);
-//
-//                uploadImageToFirebase(f.getName(),contentUri);
-
-
 
             }
 
         }
     }
 
-//    private void dispatchTakePictureIntent() {
-//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        // Ensure that there's a camera activity to handle the intent
-//        Toast.makeText(this, "Waiting", Toast.LENGTH_SHORT).show();
-//        // Create the File where the photo should go
-//        File photoFile = null;
-//        try {
-//            photoFile = createImageFile();
-//        } catch (IOException ex) {
-////
-//        }
-//            // Continue only if the File was successfully created
-//        if (photoFile != null) {
-//
-//            Uri photoURI = FileProvider.getUriForFile(this,
-//                    "com.example.fileprovider",
-//                    photoFile);
-//            Toast.makeText(this, "Waiting33", Toast.LENGTH_SHORT).show();
-////            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-////            startActivityForResult(takePictureIntent, CAMERA_REQUEST_CODE);
-//        }
-//        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-//
-//        }
-//    }
-
-//    private void uploadImageToFirebase(String name, Uri contentUri) {
-//        final StorageReference image = storageReference.child(task_id).child(name);
-//        image.putFile(contentUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//            @Override
-//            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                image.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//                    @Override
-//                    public void onSuccess(Uri uri) {
-//                        Log.d("tag", "onSuccess: Uploaded Image URl is " + uri.toString());
-//                    }
-//                });
-//
-//                Toast.makeText(AddPictures.this, "Image Is Uploaded.", Toast.LENGTH_SHORT).show();
-//            }
-//        }).addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception e) {
-//                Toast.makeText(AddPictures.this, "Upload Failled.", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//    }
-
-//    private File createImageFile() throws IOException {
-//
-//    }
-//
-//    private File createImageFile() throws IOException {
-//        // Create an image file name
-//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-//        String imageFileName = "JPEG_" + timeStamp + "_";
-////        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-//        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-//        File image = File.createTempFile(
-//                imageFileName,  /* prefix */
-//                ".jpg",         /* suffix */
-//                storageDir      /* directory */
-//        );
-//        Toast.makeText(this, "Waiting22", Toast.LENGTH_SHORT).show();
-//
-//        // Save a file: path for use with ACTION_VIEW intents
-//        currentPhotoPath = image.getAbsolutePath();
-//        return image;
-//    }
-
     private void uploadImagetoFirebase() {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
+        String name;
+//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        if (isStarted)
+            name = "START";
+        else
+            name = "END";
+
+        String imageFileName = "JPEG_" + name;
 
 //         Code for showing progressDialog while uploading
         ProgressDialog progressDialog

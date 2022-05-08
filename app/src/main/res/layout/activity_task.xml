@@ -107,30 +107,45 @@
                         android:layout_height="@dimen/list_height"
                         android:drawSelectorOnTop="true"
                         android:nestedScrollingEnabled="true"
-                        android:orientation="vertical"></ListView>
+                        android:orientation="vertical">
+
+                    </ListView>
+
                 </RelativeLayout>
 
-                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+                <LinearLayout
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/employeesList"
+                    android:layout_marginTop="6dp"
                     android:minHeight="88dp"
-                    android:padding="4dp"
                     android:orientation="vertical"
-                    android:layout_below="@id/employeesList">
+                    android:padding="4dp">
 
+
+                    <Button
+                        android:id="@+id/checkImages"
+                        android:layout_width="299dp"
+                        android:layout_height="36dp"
+                        android:layout_marginTop="44dp"
+                        android:background="@color/colorPrimaryDark"
+                        android:text="Check Images"
+                        android:textColor="@color/whitecolor" />
 
                     <TextView
                         android:id="@+id/evaluation"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
                         android:layout_weight="1"
                         android:gravity="center_horizontal"
-                        android:layout_marginTop="20dp"
                         android:text="Evaluation"
                         android:textColor="#2e79f2"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        android:visibility="invisible"/>
+                        android:visibility="invisible" />
+
                     <RatingBar
                         android:id="@+id/ratingBar_task"
                         android:layout_width="wrap_content"
@@ -141,9 +156,8 @@
                         android:rating="0"
                         android:stepSize="0"
                         android:theme="@style/RatingBar"
-                        android:visibility="invisible"/>
+                        android:visibility="invisible" />
                 </LinearLayout>
-
 
             </RelativeLayout>
 

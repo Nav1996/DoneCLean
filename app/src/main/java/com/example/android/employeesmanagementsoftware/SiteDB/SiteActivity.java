@@ -73,11 +73,10 @@ public class SiteActivity extends AppCompatActivity {
         tasks_list = new ArrayList<>();
 
         description =  findViewById(R.id.description);
-        tasks = findViewById(R.id.cleaner_tasks_list);
-        employees = findViewById(R.id.tasks_list);
+        employees = findViewById(R.id.cleaner_tasks_list);
+        tasks = findViewById(R.id.tasks_list);
 
         getDepartment();
-        setTaskList();
 //        employees.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //
 //            @Override
@@ -102,15 +101,20 @@ public class SiteActivity extends AppCompatActivity {
 
     }
 
-    private void setTaskList() {
+    private void setTaskList(String site_name) {
         Query query = FirebaseDatabase.getInstance().getReference().child("Tasks").orderByChild("site").equalTo(site_name);
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        tasks_list.add(snapshot.child("name").getValue().toString());
-                        employees_list.add(snapshot.child("employees").getValue().toString());
+                        try {
+                            tasks_list.add(snapshot.child("name").getValue().toString());
+                            employees_list.add(snapshot.child("employees").getValue().toString());
+                        } catch(Exception e) {
+
+                            }
+
                     }
 
                     ArrayAdapter<String> adapterClean = new ArrayAdapter<>(getApplicationContext(),
@@ -119,7 +123,7 @@ public class SiteActivity extends AppCompatActivity {
 
                     ArrayAdapter<String> adapterEmployees = new ArrayAdapter<>(getApplicationContext(),
                             android.R.layout.simple_list_item_1, employees_list);
-                    employees.setAdapter(adapterClean);
+                    employees.setAdapter(adapterEmployees);
                 }
             }
 
@@ -138,6 +142,8 @@ public class SiteActivity extends AppCompatActivity {
                 description.setText(dataSnapshot.child("description").getValue().toString());
                 setTitle(dataSnapshot.child("name").getValue().toString());
                 site_name = dataSnapshot.child("name").getValue().toString();
+
+                setTaskList(site_name);
             }
 
             @Override
