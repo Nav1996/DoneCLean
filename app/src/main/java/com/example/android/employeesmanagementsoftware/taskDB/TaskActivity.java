@@ -62,7 +62,6 @@ public class TaskActivity extends AppCompatActivity implements Evaluation.Evalua
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
-//         employeeDBHelper = new EmployeesManagementDbHelper(this);
 
         Intent intent = getIntent();
         task_id = intent.getStringExtra("task_id");
@@ -79,12 +78,7 @@ public class TaskActivity extends AppCompatActivity implements Evaluation.Evalua
         employees = findViewById(R.id.cleaner_tasks_list);
         checkImages = findViewById(R.id.checkImages);
 
-//         Intent intent= getIntent();
-//         position = intent.getExtras().getInt("position");
-//         tasks = (ArrayList<Task>) getIntent().getSerializableExtra("data");
-//         taskID = getIntent().getExtras().getLong("taskId");
 
-//
         taskobj = new TaskClass();
         ArrayList<String> cleaners = new ArrayList<>();
 
@@ -232,7 +226,7 @@ public class TaskActivity extends AppCompatActivity implements Evaluation.Evalua
             intent.putExtra("task", taskobj.getClass());
             intent.putExtra("task_id",taskobj.getId());
             intent.putExtra("IsEdit", true);
-            finish();
+//            finish();
             startActivity(intent);
         }
         if (id == R.id.action_done) {
@@ -249,12 +243,9 @@ public class TaskActivity extends AppCompatActivity implements Evaluation.Evalua
 
     @Override
     public void applyingRating(int rate) {
-//        Log.v("ID From Activityr", "" + taskobj.getId());
-//        boolean re = employeeDBHelper.updateTaskEvaluation(tasks.get(position).getId(),true,rate);
-//        Log.v("boolean", "" + re);
         taskobj.setEvaluation(rate);
         taskobj.setDone(true);
-//        TasksFragment.newInstance().updateTasksList(tasks.get(position),(int)taskID);
+//
         mRatingBar.setRating(rate);
         mRatingBar.setVisibility(View.VISIBLE);
         mEvaluation.setVisibility(View.VISIBLE);

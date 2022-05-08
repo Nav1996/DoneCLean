@@ -74,32 +74,57 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_creation);
 
-        departments = new ArrayList<>();
-        setDepartmentsToArray();
-
-        Intent intent = getIntent();
-        isEdit = intent.getBooleanExtra("IsEdit", false);
-        taskID = intent.getStringExtra("task_id");
-
-//        cleaners = cleans.getEmployees();
-        getCleaners();
-        Toast.makeText(getApplicationContext(), "Hello " + cleaners, Toast.LENGTH_SHORT).show();
-
-        Bundle taskData=getIntent().getExtras();
-        long task_id=TaskCreationUtil.NEW_TASK_ID;
-        if (taskData!=null) {
-//            task_id = taskData.getString("task_id");
-            task = (Task) taskData.get("task");
-        }
-
         name = findViewById(R.id.task_name_edit);
         date = findViewById(R.id.task_deadline_edit);
         description = findViewById(R.id.department_description_edit_text);
         sitelist = findViewById(R.id.departmentlist);
         employeeslist = findViewById(R.id.employees_List);
 
+        departments = new ArrayList<>();
+        setDepartmentsToArray();
+//
+        Intent intent = getIntent();
+        isEdit = intent.getBooleanExtra("IsEdit", false);
+//
+//
+        getCleaners();
+
+//        Bundle taskData=getIntent().getExtras();
+//        long task_id=TaskCreationUtil.NEW_TASK_ID;
+//        if (taskData!=null) {
+////            task_id = taskData.getString("task_id");
+//            task = (Task) taskData.get("task");
+//        }
+
+        if (intent.hasExtra("task_id")) {
+            taskID = intent.getStringExtra("task_id");
+
+            setTexts(taskID);
+        }
+
     }
 
+    private void setTexts(String taskID) {
+        dbref = FirebaseDatabase.getInstance().getReference().child("Tasks").child(taskID);
+        dbref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                Toast.makeText(getApplicationContext(), "Task- "+snapshot, Toast.LENGTH_SHORT).show();
+                if (snapshot.exists()) {
+                    name.setText(snapshot.child("name").getValue().toString());
+                    date.setText(snapshot.child("deadline").getValue().toString());
+                    description.setText(snapshot.child("description").getValue().toString());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    // Get the selected site
     private void getSite() {
         sitelist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -110,7 +135,7 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
         });
     }
 
-
+    // Set the cleaners to the listview
     private void setListview(ArrayList cleaners) {
         ArrayAdapter<String> adapterClean = new ArrayAdapter<>(getApplicationContext(),
                 android.R.layout.simple_list_item_1, cleaners);
@@ -119,6 +144,7 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
         getEmployees();
     }
 
+    // Get the selected employee
     private void getEmployees() {
         employeeslist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -134,6 +160,7 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
         });
     }
 
+    //Get the departments and assign to the arraylist
     public void setDepartmentsToArray() {
         dbref = FirebaseDatabase.getInstance().getReference().child("site");
         dbref.addValueEventListener(new ValueEventListener() {
@@ -151,12 +178,12 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
                             Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
                         }
                     }
-
+//
                     ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
                             android.R.layout.simple_spinner_item, departments);
-
+//
                     sitelist.setAdapter(adapter);
-
+//
                     getSite();
                 }
                 else {
@@ -172,9 +199,8 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void getCleaners() {
-//        ArrayList<String> cleaner = new ArrayList<>();
         Query query = FirebaseDatabase.getInstance().getReference().child("member").orderByChild("userType").equalTo("Cleaner");
-//        dbref = FirebaseDatabase.getInstance().getReference().child("member").child("name")
+
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
