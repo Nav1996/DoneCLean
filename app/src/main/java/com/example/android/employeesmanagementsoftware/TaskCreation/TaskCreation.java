@@ -60,7 +60,7 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
     Spinner spinner;
     private EditText name, date, description;
     ListView employeeslist, sitelist;
-    String dept;
+    String dept, taskID;
     TaskClass taskobj;
     ArrayList<String> departments;
     String selectedCleaners;
@@ -79,6 +79,7 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
 
         Intent intent = getIntent();
         isEdit = intent.getBooleanExtra("IsEdit", false);
+        taskID = intent.getStringExtra("task_id");
 
 //        cleaners = cleans.getEmployees();
         getCleaners();
@@ -87,7 +88,7 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
         Bundle taskData=getIntent().getExtras();
         long task_id=TaskCreationUtil.NEW_TASK_ID;
         if (taskData!=null) {
-            task_id = taskData.getLong("task_id");
+//            task_id = taskData.getString("task_id");
             task = (Task) taskData.get("task");
         }
 
@@ -96,27 +97,6 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
         description = findViewById(R.id.department_description_edit_text);
         sitelist = findViewById(R.id.departmentlist);
         employeeslist = findViewById(R.id.employees_List);
-//
-//        spinner.setAdapter(adapter);
-//        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-//                selectSites = departments.get(i);
-//                Toast.makeText(getApplicationContext(), "Spinner "+selectSites, Toast.LENGTH_SHORT).show();
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> adapterView) {
-//
-//            }
-//        });
-
-
-//        util=new TaskCreationUtil(this,employeeDBHelper);
-//        commander=util.getCommander(task_id,task);
-//        TaskCreationAdapterPool adapterPool = new TaskCreationAdapterPool(employeeDBHelper, this, employees,
-//                commander.execute());
-//                initSpinner(adapterPool);
 
     }
 
@@ -245,27 +225,50 @@ public class TaskCreation extends AppCompatActivity implements AdapterView.OnIte
         String deadline = deadlineLayout.getEditText().getText().toString();
 
         String rand_id = UUID.randomUUID().toString();
-        taskobj = new TaskClass(rand_id, name, description, deadline, selectedCleaners, selectSites, false, 0);
 
-        dbref = FirebaseDatabase.getInstance().getReference().child("Tasks");
+
 
         if (item.getItemId() == R.id.save_task_creation_button) {
+            if (isEdit) {
+                taskobj = new TaskClass(taskID, name, description, deadline, selectedCleaners, selectSites, false, 0);
+                dbref = FirebaseDatabase.getInstance().getReference().child("Tasks").child(taskID);
 
-            dbref.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
-                    dbref.child(rand_id).setValue(taskobj);
-                    Toast.makeText(getApplicationContext(), "Task created successfully", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(TaskCreation.this, TaskActivity.class);
-                    intent.putExtra("task_id", rand_id);
-                    startActivity(intent);
-                }
+                dbref.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
+                        dbref.setValue(taskobj);
+                        Toast.makeText(getApplicationContext(), "Task Edited successfully", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(TaskCreation.this, TaskActivity.class);
+                        intent.putExtra("task_id", taskID);
+                        startActivity(intent);
+                    }
 
-                @Override
-                public void onCancelled(@NonNull @NotNull DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError databaseError) {
 
-                }
-            });
+                    }
+                });
+            }
+            else {
+                taskobj = new TaskClass(rand_id, name, description, deadline, selectedCleaners, selectSites, false, 0);
+                dbref = FirebaseDatabase.getInstance().getReference().child("Tasks");
+
+                dbref.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
+                        dbref.child(rand_id).setValue(taskobj);
+                        Toast.makeText(getApplicationContext(), "Task created successfully", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(TaskCreation.this, TaskActivity.class);
+                        intent.putExtra("task_id", rand_id);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
         }
 
         return true;

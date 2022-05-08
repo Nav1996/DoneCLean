@@ -38,6 +38,7 @@ public class SiteCreation extends AppCompatActivity {
     private Intent intent;
     private long departmentId;
     private Site site;
+    boolean IsEditable;
     DatabaseReference reff, readreff;
     FirebaseFirestore firestore;
     FirebaseAuth firebaseAuth;
@@ -47,7 +48,7 @@ public class SiteCreation extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_site_creation);
         intent = getIntent();
-        boolean IsEditable = intent.getExtras().getBoolean("IsEdit");
+        IsEditable = intent.getExtras().getBoolean("IsEdit");
         emdb =  new EmployeesManagementDbHelper(this);
         Toolbar toolbar =  findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -94,7 +95,6 @@ public class SiteCreation extends AppCompatActivity {
     }
 
     private void updateAction(DatabaseReference reff) {
-//        departmentId = intent.getExtras().getLong("depatmentID");
         String dep_id = intent.getStringExtra("depatmentID");
 
         readreff = reff.child(dep_id);
@@ -116,7 +116,7 @@ public class SiteCreation extends AppCompatActivity {
                             readreff.addValueEventListener(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull @NotNull DataSnapshot dataSnapshot) {
-                                    reff.setValue(site);
+                                    readreff.setValue(site);
                                     Toast.makeText(getApplicationContext(), "Successfuly added Site", Toast.LENGTH_SHORT).show();
                                     actionSave(true, view, false, dep_id);
                                 }

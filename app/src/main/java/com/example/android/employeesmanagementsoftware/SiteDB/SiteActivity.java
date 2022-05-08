@@ -77,15 +77,6 @@ public class SiteActivity extends AppCompatActivity {
         tasks = findViewById(R.id.tasks_list);
 
         getDepartment();
-//        employees.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-//                Intent intent = new Intent(SiteActivity.this, CleanerActivity.class);
-//                intent.putExtra("employeeId", id);
-//                startActivityForResult(intent, EMP_REQUEST);
-//            }
-//        });
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -96,9 +87,6 @@ public class SiteActivity extends AppCompatActivity {
                 startActivityForResult(intent, EMP_REQUEST);
             }
         });
-
-//        displayTaskList();
-
     }
 
     private void setTaskList(String site_name) {
